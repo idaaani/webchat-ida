@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Chat Sederhana</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #messages {
+      width: 300px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      height: 200px;
+      overflow-y: scroll;
+      text-align: left;
+    }
+    #form {
+      margin-top: 10px;
+    }
+    #message, #username {
+      width: 200px;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Web Chat Sederhana</h2>
+
+  <input id="username" type="text" placeholder="Nama Anda" required />
+  <div id="messages"></div>
+
+  <form id="form">
+    <input id="message" type="text" placeholder="Tulis pesan..." autocomplete="off" required />
+    <button type="submit">Kirim</button>
+  </form>
+
+  <script>
+    const socket = io();
+
+    document.getElementById("form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!username) {
+        alert("Masukkan nama Anda terlebih dahulu.");
+        return;
+      }
+
+      if (message) {
+        socket.emit("chat message", {
+          username: username,
+          message: message
+        });
+
+        document.getElementById("message").value = ""; // Kosongkan input pesan
+      }
+    });
+
+    socket.on("chat message", function(data) {
+    let item = document.createElement("p");
+    item.textContent = `${data.username}: ${data.message}`;
+    document.getElementById("messages").appendChild(item);
+
+
+
+      // Scroll otomatis ke bawah
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  </script>
+</body>
+</html>
